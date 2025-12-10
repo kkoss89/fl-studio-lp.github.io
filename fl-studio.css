@@ -457,6 +457,24 @@ body {
     transform: rotate(10deg);
 }
 
+
+/* Offers */
+.offer_item {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 5px;
+    background: var(--accent);
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.offer_item:hover {
+    background: var(--accent-dark);
+    transform: translateY(-2px);
+}
+
 /* Marquee Carousel */
 .marquee-wrapper {
     width: 100%;
