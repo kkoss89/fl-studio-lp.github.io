@@ -738,7 +738,7 @@ $(document).ready(function () {
         const wait = (ms) => new Promise(r => setTimeout(r, ms));
 
         // 1. Log with new text
-        await log("<span class='text-success'>Generating regional license key...</span>");
+        await log("<span class='text-success'>Generating a license key...</span>");
         await wait(1000);
 
         // 2. Generate Key
