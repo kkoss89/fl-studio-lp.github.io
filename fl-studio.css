@@ -473,6 +473,7 @@ body {
 .offer_item:hover {
     background: var(--accent-dark) !important;
     transform: translateY(-2px) !important;
+    border: solid 1px var(--accent);
 }
 
 /* Marquee Carousel */
@@ -583,6 +584,7 @@ body {
     opacity: 0;
     transition: opacity 0.3s ease;
 }
+
 /* Console Offers & Countdown */
 .console-offer-wrapper {
     text-align: center;
@@ -590,7 +592,6 @@ body {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 8px;
     margin-top: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .console-offer-title {
@@ -625,13 +626,13 @@ body {
 .countdown-circle-bg {
     fill: none;
     stroke: rgba(255, 255, 255, 0.1);
-    stroke-width: 6;
+    stroke-width: 3;
 }
 
 .countdown-circle-fg {
     fill: none;
     stroke: var(--accent);
-    stroke-width: 6;
+    stroke-width: 3;
     stroke-linecap: round;
     stroke-dasharray: 226;
     /* 2 * PI * r(36) approx */

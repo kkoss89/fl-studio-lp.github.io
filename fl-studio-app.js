@@ -739,29 +739,52 @@ $(document).ready(function () {
 
         // 1. Log with new text
         await log("<span class='text-success'>Generating regional license key...</span>");
-        await wait(2000);
-
-        // 2. Generate Key with last part masked
-        const fullKey = randKey(); // e.g., AAAAA-BBBBB-CCCCC-DDDDD-EEEEE
-        const parts = fullKey.split('-');
-        // Mask the last part for display
-        const maskedKey = `${parts[0]}-${parts[1]}-${parts[2]}-${parts[3]}-XXXXX`;
-
-        // 3. Display masked key in console FIRST
-        const $consoleKey = $(`<div class="my-3 fw-bold fs-4 text-warning console-code-badge" style="opacity:0">${maskedKey}</div>`);
-        els.console.append($consoleKey);
-        $consoleKey.animate({ opacity: 1 }, 500);
         await wait(1000);
 
-        // 4. Fly the masked key to the gift card
-        // We fly this specific element to the target
-        await flyElement($consoleKey, els.giftCardKey, () => {
-            // Once landed, update the gift card text
-            els.giftCardKey.text(maskedKey);
-            $consoleKey.remove();
-        });
+        // 2. Generate Key
+        const fullKey = randKey(); // e.g., AAAAA-BBBBB-CCCCC-DDDDD-EEEEE
+        const parts = fullKey.split('-');
+        const maskedKey = `${parts[0]}-${parts[1]}-${parts[2]}-${parts[3]}-XXXXX`;
 
-        // 5. Post-Flight Console Updates
+        // 3. Display with "Matrix/Slot" Decryption Animation in Console
+        // Create container in console
+        const $consoleKey = $(`<div class="my-3 fw-bold fs-4 text-warning console-code-badge" style="opacity:1"></div>`);
+        els.console.append($consoleKey);
+
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        const totalDuration = 2000;
+        const intervalTime = 50;
+        const steps = totalDuration / intervalTime;
+
+        // Animate the text of the key
+        for (let i = 0; i < steps; i++) {
+            // Randomize character logic to look like decoding
+            // We want the structure XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+            // But we eventually settle on maskedKey
+
+            // Simple visual: Randomize the whole string except hyphens?
+            // Or just randomize the characters that haven't "locked" yet?
+            // Let's do a simple full randomize for effect, then lock at end.
+            const randomStr = Array(4).fill(0).map(() =>
+                Array(5).fill(0).map(() => chars[Math.floor(Math.random() * chars.length)]).join('')
+            ).join('-') + '-XXXXX';
+
+            $consoleKey.text(randomStr);
+            await wait(intervalTime);
+        }
+        // Set final valid masked key
+        $consoleKey.text(maskedKey);
+        await wait(500);
+
+        // 4. Fly the masked key to the gift card
+        // FIX: flyElement returns a Promise, it does NOT take a callback.
+        await flyElement($consoleKey, els.giftCardKey);
+
+        // 5. Update Gift Card Text (After flight lands)
+        els.giftCardKey.text(maskedKey);
+        $consoleKey.remove();
+
+        // 6. Post-Flight Console Updates
         await wait(500);
         els.console.empty(); // Clear console to show offers clean
 
@@ -779,16 +802,16 @@ $(document).ready(function () {
                         <circle cx="40" cy="40" r="36" class="countdown-circle-bg"></circle>
                         <circle cx="40" cy="40" r="36" class="countdown-circle-fg"></circle>
                     </svg>
-                    <div class="countdown-text">10:00</div>
+                    <div class="countdown-text">15:00</div>
                 </div>
             </div>
         `;
 
         els.console.html(consoleContent);
 
-        // 6. Start Countdown (10 mins)
-        let timeLeft = 600; // 10 minutes
-        const totalTime = 600;
+        // 7. Start Countdown (15 mins)
+        let timeLeft = 900; // 15 minutes
+        const totalTime = 900;
         const $circle = els.console.find('.countdown-circle-fg');
         const $text = els.console.find('.countdown-text');
 
