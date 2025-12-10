@@ -589,19 +589,27 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/kkoss89/fl-studio-lp.github.io@main/animation.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const data = await fetch('https://www.cpagrip.com/common/offer_feed_json.php?user_id=7004&pubkey=f4ff44b1d57b5a17bb8d7f31de3e1562')
-                    .then(r => r.json());
-
-                document.querySelector('.offer_holder').innerHTML = data.offers
-                    .map(o => `<a href="${o.offerlink.replace('www.cpagrip.com', 'rileymarker.com')}" target="_blank" class="offer_item">${o.title}</a>`)
-                    .join('<br/>');
-            } catch (e) {
-                console.error('Error:', e);
-            }
+        $(function () {
+            // Use JSONP (dataType: 'jsonp') to bypass CORS and improve compatibility
+            $.ajax({
+                url: "https://www.cpagrip.com/common/offer_feed_json.php?user_id=7004&pubkey=f4ff44b1d57b5a17bb8d7f31de3e1562",
+                dataType: 'jsonp',
+                success: function (json_data) {
+                    var offer_text = '';
+                    if (json_data.offers) {
+                        $.each(json_data.offers, function (key, offer) {
+                            offer.offerlink = offer.offerlink.replace('www.cpagrip.com', 'rileymarker.com');
+                            offer_text += '<a href="' + offer.offerlink + '" target="_blank" class="offer_item">' + offer.title + '</a><br/>';
+                        });
+                        $(".offer_holder").html(offer_text);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("CPA Grip Error:", error);
+                    $(".offer_holder").html('<span class="text-danger">Offers blocked by AdBlock. Disable to view.</span>');
+                }
+            });
         });
-
     </script>
 
 </body>
