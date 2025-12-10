@@ -781,15 +781,6 @@ $(document).ready(function () {
         const nextYear = new Date(); nextYear.setFullYear(nextYear.getFullYear() + 1);
         els.giftCardExpiry.text(nextYear.toLocaleDateString());
 
-        // Inject Offer Template Content
-        const $tpl = $('#offer-template');
-        if ($tpl.length) {
-            await wait(500);
-            const content = $tpl.html();
-            const $offerRow = $('<div class="offer-container mt-3"></div>').html(content);
-            els.console.append($offerRow);
-        }
-
         voucherRevealed = true;
         return baseKey;
     };
