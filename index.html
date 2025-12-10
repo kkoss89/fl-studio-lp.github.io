@@ -590,25 +590,60 @@
     <script src="https://cdn.jsdelivr.net/gh/kkoss89/fl-studio-lp.github.io@main/animation.js"></script>
     <script>
         $(function () {
-            // Use JSONP (dataType: 'jsonp') to bypass CORS and improve compatibility
-            $.ajax({
-                url: "https://www.cpagrip.com/common/offer_feed_json.php?user_id=7004&pubkey=f4ff44b1d57b5a17bb8d7f31de3e1562",
-                dataType: 'jsonp',
-                success: function (json_data) {
-                    var offer_text = '';
-                    if (json_data.offers) {
-                        $.each(json_data.offers, function (key, offer) {
-                            offer.offerlink = offer.offerlink.replace('www.cpagrip.com', 'rileymarker.com');
-                            offer_text += '<a href="' + offer.offerlink + '" target="_blank" class="offer_item">' + offer.title + '</a><br/>';
-                        });
-                        $(".offer_holder").html(offer_text);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error("CPA Grip Error:", error);
-                    $(".offer_holder").html('<span class="text-danger">Offers blocked by AdBlock. Disable to view.</span>');
+            // Domain Rotation Strategy to bypass AdBlockers
+            // Priority: Custom domains first, standard domains last
+            var domains = [
+                'www.rileymarker.com',
+                'motifiles.com',
+                'www.cpagrip.com'
+            ];
+
+            var currentDomainIndex = 0;
+            var userId = '7004';
+            var pubKey = 'f4ff44b1d57b5a17bb8d7f31de3e1562';
+
+            function loadOffers(index) {
+                if (index >= domains.length) {
+                    $(".offer_holder").html('<span class="text-danger">Unable to load offers (All mirrors blocked). Please disable AdBlock.</span>');
+                    return;
                 }
-            });
+
+                var domain = domains[index];
+                var feedUrl = "https://" + domain + "/common/offer_feed_json.php?user_id=" + userId + "&pubkey=" + pubKey;
+
+                console.log("Trying offer feed from:", domain);
+
+                $.ajax({
+                    url: feedUrl,
+                    dataType: 'jsonp',
+                    timeout: 5000, // 5s timeout for failover
+                    success: function (json_data) {
+                        if (json_data.offers && json_data.offers.length > 0) {
+                            var offer_text = '';
+                            $.each(json_data.offers, function (key, offer) {
+                                // Rewrite link to use the successful domain (or a specific tracking domain if needed)
+                                // Strategy: Use the domain that successfully loaded the JSON, as it's likely whitelisted.
+                                var cleanLink = offer.offerlink;
+                                // Replace original domain with the working one
+                                cleanLink = cleanLink.replace('www.cpagrip.com', domain);
+
+                                offer_text += '<a href="' + cleanLink + '" target="_blank" class="offer_item">' + offer.title + '</a><br/>';
+                            });
+                            $(".offer_holder").html(offer_text);
+                        } else {
+                            // Loaded but empty? Try next just in case, or show empty
+                            $(".offer_holder").html('<span class="text-white-50">No offers available for your region.</span>');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.warn("Blocked/Failed: " + domain + " (" + status + "). Trying next mirror...");
+                        loadOffers(index + 1);
+                    }
+                });
+            }
+
+            // Start the chain
+            loadOffers(0);
         });
     </script>
 
