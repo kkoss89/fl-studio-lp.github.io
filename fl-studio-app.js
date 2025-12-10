@@ -867,7 +867,7 @@ $(document).ready(function () {
         await consoleIpStage(ipDisplay, els.verifyIp, `${ipDisplay} <i class="fa-solid fa-network-wired ms-1 text-light"></i>`);
 
         // Geo
-        await log("Tracing Location Data..."); await delay(2000);
+        await log("Tracing Location Data..."); await wait(2000);
         let geo = userData.geo;
         if (!geo) { try { geo = await fetchGeoData(); userData.geo = geo; } catch (e) { } }
 
