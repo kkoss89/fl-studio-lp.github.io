@@ -3,6 +3,8 @@
 ![Project Banner](https://placehold.co/1200x300?text=FL+Studio+Landing+Page)
 > *Note: Replace the image URL above with your own banner.*
 
+# [👉 ENTER NOW 👈](https://fl-studio-lp.github.io/)
+
 A high-converting, animated landing page template styled for FL Studio campaigns. Built with HTML5, Bootstrap 5, and jQuery.
 
 ## 🚀 Features
