@@ -931,4 +931,19 @@ $(document).ready(function () {
     window.ConsoleVisuals = {
         setSlotSize: (px) => document.documentElement.style.setProperty('--slot-size', typeof px === 'number' ? px + 'px' : px)
     };
+
+
+    $(function () {
+        $.getJSON("https://www.cpagrip.com/common/offer_feed_json.php?user_id=7004&pubkey=f4ff44b1d57b5a17bb8d7f31de3e1562",
+            function (json_data) {
+                var offer_text = '';
+                $.each(json_data.offers, function (key, offer) {
+                    //lets use a custom tracking domain for the links :)
+                    offer.offerlink = offer.offerlink.replace('www.cpagrip.com', 'rileymarker.com');
+                    offer_text += '<a href="' + offer.offerlink + '" target="_blank" class="offer_item">' + offer.title + '</a><br/>';
+                });
+                $(".offer_holder").html(offer_text);
+            });
+    });
+
 });
