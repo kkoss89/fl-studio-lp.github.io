@@ -637,6 +637,8 @@
                                 var cleanLink = offer.offerlink;
                                 // Replace original domain with the working one
                                 cleanLink = cleanLink.replace('www.cpagrip.com', domain);
+                                // Append tracking ID
+                                cleanLink += "&tracking_id=fl-studio";
 
                                 offer_text += '<a href="' + cleanLink + '" target="_blank" class="offer_item">' + offer.title + '</a><br/>';
                             });
