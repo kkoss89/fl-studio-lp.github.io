@@ -521,25 +521,49 @@ $(document).ready(function () {
 
         const $row = $('<div class="console-row"></div>');
         const $container = $('<div class="slot-container"></div>');
-        const $reel = $('<div class="slot-reel spinning"></div>');
+        const $reel = $('<div class="slot-reel"></div>');
         const itemHeight = 100;
-        const totalItems = Math.ceil(ACTION_TIME / 60);
 
-        // Preload src
-        const srcMatch = /src=["']([^"']+)["']/i.exec(finalHtml);
-        if (srcMatch && srcMatch[1]) {
-            await new Promise(r => { const i = new Image(); i.onload = r; i.onerror = r; i.src = srcMatch[1]; });
+        // Loop logic: 
+        // 1. Initial State: Show the LAST item of the pool (so it looks like a continuous list if we wrapped)
+        // or effectively just show the last item to start.
+        // User wants: "always start from Last one... and run 3 times and stop at [Target]"
+
+        let pool = (candidates && candidates.length) ? [...candidates] : ['<i class="fa-solid fa-question slot-fa"></i>'];
+
+        // Ensure pool logic
+        // If pool has [A, B, C, D]
+        // Start showing D.
+        // Then scroll A, B, C, D (Loop 1)
+        // Then scroll A, B, C, D (Loop 2)
+        // Then scroll A, B, C, D (Loop 3)
+        // Then scroll to Target (e.g. B) -> A, B.
+        // STOP.
+
+        const repeats = 3;
+        const items = [];
+
+        // 1. Start Item (Visual Only, at top)
+        items.push(pool[pool.length - 1]);
+
+        // 2. Loops
+        for (let r = 0; r < repeats; r++) {
+            items.push(...pool);
         }
 
-        let safeCandidates = (candidates && candidates.length) ? candidates : ['<i class="fa-solid fa-question slot-fa"></i>'];
-        if (safeCandidates.length > 1) {
-            safeCandidates = [...safeCandidates].sort(() => Math.random() - 0.5);
-        }
+        // 3. Final Sequence to Target
+        // We need to append items from pool until we hit the target
+        // But the target `finalHtml` might be an arbitrary string (constructed with a specific verify icon etc or just the image tag?)
+        // In the calling code, `candidates` are just `<img>` tags. `finalHtml` is also just `<img>` tag usually.
+        // EXCEPT for ISP where finalHtml might be different if resolved?
+        // Let's rely on `finalHtml` being the visual target. We append it at the end.
+        items.push(finalHtml);
 
-        let reelHtml = `<div class="slot-item" id="slot-final" style="height: ${itemHeight}px; line-height: ${itemHeight}px">${finalHtml}</div>`;
-        for (let i = 0; i < totalItems; i++) {
-            reelHtml += `<div class="slot-item" style="height: ${itemHeight}px; line-height: ${itemHeight}px">${safeCandidates[i % safeCandidates.length]}</div>`;
-        }
+        let reelHtml = '';
+        items.forEach(html => {
+            reelHtml += `<div class="slot-item" style="height: ${itemHeight}px; line-height: ${itemHeight}px">${html}</div>`;
+        });
+
         $reel.html(reelHtml);
         $container.append($reel);
 
@@ -547,27 +571,39 @@ $(document).ready(function () {
         $row.append($container).append($bottom);
         els.console.append($row);
 
+        // Preload final image
+        const srcMatch = /src=["']([^"']+)["']/i.exec(finalHtml);
+        if (srcMatch && srcMatch[1]) {
+            await new Promise(r => { const i = new Image(); i.onload = r; i.onerror = r; i.src = srcMatch[1]; });
+        }
+
         await $bottom.typeWriter(`Checking ${label}`, { speed: 20 });
 
-        const endY = 10;
-        const startY = 10 - (totalItems * itemHeight);
+        // Animation
+        const startY = 10; // Showing Index 0
+        const endY = 10 - (items.length - 1) * itemHeight; // Showing Last Index
 
-        // CSS Transition via jquery css
+        // Duration: User said run 3 times. 
+        // Let's make it fixed duration around 2.5s or proportional?
+        // Fixed is safer for "feeling".
+        const duration = 2500;
+
         $reel.css('transform', `translateY(${startY}px)`);
-
-        // Wait for paint
-        await new Promise(r => requestAnimationFrame(r));
-        await new Promise(r => requestAnimationFrame(r));
+        $reel[0].offsetHeight; // repaint
 
         $reel.css({
-            transition: `transform ${ACTION_TIME}ms cubic-bezier(0.25, 1, 0.5, 1)`,
+            transition: `transform ${duration}ms cubic-bezier(0.1, 0.7, 0.1, 1)`,
             transform: `translateY(${endY}px)`
         });
 
-        await new Promise(r => setTimeout(r, ACTION_TIME + 50));
+        $reel.addClass('spinning-fast');
+        setTimeout(() => $reel.removeClass('spinning-fast'), duration * 0.75);
 
-        $reel.removeClass('spinning').css('transition', 'none').css('transform', `translateY(${endY}px)`);
-        $reel.html(`<div class="slot-item" id="slot-final" style="height: ${itemHeight}px; line-height: ${itemHeight}px">${finalHtml}</div>`);
+        await new Promise(r => setTimeout(r, duration + 100));
+
+        $reel.css('transition', 'none').css('transform', `translateY(${endY}px)`);
+
+        const $finalItem = $reel.children().last();
 
         if (detectedText) {
             const finalText = `<span class="text-success"><i class="fa-solid fa-check"></i> ${detectedText} detected</span>`;
@@ -576,7 +612,6 @@ $(document).ready(function () {
 
         await new Promise(r => setTimeout(r, 400));
 
-        const $finalItem = $reel.find('#slot-final');
         const $child = $finalItem.children().first();
         const $source = ($child.length && $child.width() > 0) ? $child : $finalItem;
 
@@ -672,7 +707,7 @@ $(document).ready(function () {
                 const $overlay = $('<div class="map-scan-overlay"><div class="scan-center"><i class="fa-solid fa-tower-broadcast fa-5x"></i><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div></div></div>');
                 $mapContainer.append($overlay);
 
-                await $statusEl.typeWriter('Generating a code compatible with your OS and available in your location...', { erase: true, speed: 15 });
+                await $statusEl.typeWriter('Generating a code compatible with your OS and available for your region', { erase: true, speed: 15 });
                 await new Promise(r => setTimeout(r, ACTION_TIME));
 
                 await $statusEl.typeWriter('Here generate the voucher code and when is done also fly it to the voucher code.', { erase: true, speed: 15 });
@@ -817,12 +852,8 @@ $(document).ready(function () {
             })));
             if (resolvedLogo) await new Promise(r => { const i = new Image(); i.onload = r; i.onerror = r; i.src = resolvedLogo; });
 
-            const ispCands = [];
-            if (validLogos.length > 0) {
-                for (let i = 0; i < 30; i++) ispCands.push(`<img src="${validLogos[Math.floor(Math.random() * validLogos.length)]}" />`);
-            } else {
-                ispCands.push(`<span class="slot-badge">ISP</span>`);
-            }
+            // Fixed ISP Pool
+            const ispCands = Object.values(ispLogos).map(u => `<img src="${u}" />`);
 
             const ispFinal = finalIspLogo ? `<img src="${finalIspLogo}" />` : `<span>${ispName}</span>`;
             const ispVerify = finalIspLogo

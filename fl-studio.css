@@ -157,9 +157,10 @@ body {
     overflow: hidden;
     position: relative;
     width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: block;
+    /* justify-content: center; Removed to fix positioning calculations */
+    /* align-items: center; */
+
     /* Fade out top and bottom */
     mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
     -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
@@ -168,9 +169,13 @@ body {
 .slot-reel {
     display: flex;
     flex-direction: column;
+    width: 100%;
     /* We'll animate 'transform: translateY(...)' in JS */
     will-change: transform;
-    /* Add blur during motion if desired (via JS class) */
+}
+
+.slot-reel.spinning-fast {
+    filter: blur(2px);
 }
 
 .slot-item {
