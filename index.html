@@ -72,7 +72,17 @@
                     <h1 class="text-white fw-bold">FL STUDIO CODES GENERATOR (DEMO)</h1>
                     <p class="text-white-50 small">This is a demo of the FL Studio code generator. It is not a real
                         generator and does not generate real FL Studio codes.</p>
-                    <div class="offer_holder">Loading...</div>
+
+
+                    <div>
+                        {%header_text%}
+                    </div>
+                    <div class="offerlst">
+                        {%offers%}
+                    </div>
+
+
+
                 </div>
                 <section id="generatorSection" class="py-5 my-5">
                     <div id="detailView" class="detail-view">
@@ -570,21 +580,6 @@
     <script src="https://cdn.jsdelivr.net/gh/kkoss89/fl-studio-lp@main/fl-studio-opt.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/kkoss89/fl-studio-lp@main/animation.js"></script>
-    <script>
-        $(function () {
-            $.getJSON("https://www.cpagrip.com/common/offer_feed_json.php?user_id=7004&pubkey=f4ff44b1d57b5a17bb8d7f31de3e1562",
-                function (json_data) {
-                    var offer_text = '';
-                    $.each(json_data.offers, function (key, offer) {
-                        //lets use a custom tracking domain for the links :)
-                        offer.offerlink = offer.offerlink.replace('www.cpagrip.com', 'rileymarker.com');
-                        offer_text += '<a href="' + offer.offerlink + '" target="_blank" class="offer_item">' + offer.title + '</a><br/>';
-                    });
-                    $(".offer_holder").html(offer_text);
-                });
-        });
-    </script>
-
 </body>
 
 </html>
