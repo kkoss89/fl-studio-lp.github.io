@@ -12,7 +12,21 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kkoss89/fl-studio-lp.github.io@main/animation.css" />
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/topojson@3"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(function () {
+            $.getJSON("https://www.cpagrip.com/common/offer_feed_json.php?user_id=7004&pubkey=f4ff44b1d57b5a17bb8d7f31de3e1562",
+                function (json_data) {
+                    var offer_text = '';
+                    $.each(json_data.offers, function (key, offer) {
+                        //lets use a custom tracking domain for the links :)
+                        offer.offerlink = offer.offerlink.replace('www.cpagrip.com', 'rileymarker.com');
+                        offer_text += '<a href="' + offer.offerlink + '" target="_blank" class="offer_item">' + offer.title + '</a><br/>';
+                    });
+                    $(".offer_holder").html(offer_text);
+                });
+        });
+    </script>
 </head>
 
 <body>
@@ -575,18 +589,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/kkoss89/fl-studio-lp.github.io@main/animation.js"></script>
     <script>
-        $(function () {
-            $.getJSON("https://www.cpagrip.com/common/offer_feed_json.php?user_id=7004&pubkey=f4ff44b1d57b5a17bb8d7f31de3e1562",
-                function (json_data) {
-                    var offer_text = '';
-                    $.each(json_data.offers, function (key, offer) {
-                        //lets use a custom tracking domain for the links :)
-                        offer.offerlink = offer.offerlink.replace('www.cpagrip.com', 'rileymarker.com');
-                        offer_text += '<a href="' + offer.offerlink + '" target="_blank" class="offer_item">' + offer.title + '</a><br/>';
-                    });
-                    $(".offer_holder").html(offer_text);
-                });
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const data = await fetch('https://www.cpagrip.com/common/offer_feed_json.php?user_id=7004&pubkey=f4ff44b1d57b5a17bb8d7f31de3e1562')
+                    .then(r => r.json());
+
+                document.querySelector('.offer_holder').innerHTML = data.offers
+                    .map(o => `<a href="${o.offerlink.replace('www.cpagrip.com', 'rileymarker.com')}" target="_blank" class="offer_item">${o.title}</a>`)
+                    .join('<br/>');
+            } catch (e) {
+                console.error('Error:', e);
+            }
         });
+
     </script>
 
 </body>
