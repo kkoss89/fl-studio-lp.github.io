@@ -1,5 +1,5 @@
 LOGO_DEV_TOKEN = 'pk_MuEc4Fh-Tpmqc9I8m8hzVg'; // Public key
-const ACTION_TIME = 2000;
+const ACTION_TIME = 1000;
 
 const editions = [
     { title: 'FRUITY', img: 'https://i.imgur.com/DbZtjFI.png', desc: 'Perfect for beatmaking and melodies. Includes core pattern-based workflow features.' },
