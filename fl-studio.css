@@ -578,11 +578,75 @@ body {
     background: rgba(0, 0, 0, 0.4);
     z-index: 2;
     pointer-events: none;
-    /* Allow click through to iframe if needed, or remove to use as cover */
+    /* Only show overlay if we were using a custom thumbnail click-to-play pattern. 
+   Keeping it hidden by default. */
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
-/* Only show overlay if we were using a custom thumbnail click-to-play pattern. 
-   For direct iframe embed, we might not need this unless we overlay a cover image. 
-   Keeping it hidden by default or for hover effects on a container. */
+
+/* Console Offers & Countdown */
+.console-offer-wrapper {
+    text-align: center;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    margin-top: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.console-offer-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.console-offer-phrase {
+    color: #ffd700;
+    margin: 15px 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Circular Countdown */
+.countdown-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+}
+
+.countdown-svg {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+}
+
+.countdown-circle-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 6;
+}
+
+.countdown-circle-fg {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 226;
+    /* 2 * PI * r(36) approx */
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear;
+}
+
+.countdown-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+}

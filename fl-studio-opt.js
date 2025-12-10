@@ -736,53 +736,91 @@ $(document).ready(function () {
 
     const revealVoucherCode = async () => {
         const wait = (ms) => new Promise(r => setTimeout(r, ms));
-        await log("<span class='text-success'>Generating Unique Hash...</span>");
-        await wait(1500);
 
-        const baseKey = randKey();
-        const parts = baseKey.split('-');
-        let currentDisplay = ['XXXXX', 'XXXXX', 'XXXXX', 'XXXXX'];
-        const updateDisplay = (lastPartBlurred) => {
-            const visible = currentDisplay.slice(0, 3).join('-');
-            if (lastPartBlurred) {
-                els.giftCardKey.html(`${visible}-<span style="filter: blur(4px); user-select: none;">${currentDisplay[3]}</span>`);
-            } else {
-                els.giftCardKey.text(currentDisplay.join('-'));
+        // 1. Log with new text
+        await log("<span class='text-success'>Generating regional license key...</span>");
+        await wait(2000);
+
+        // 2. Generate Key with last part masked
+        const fullKey = randKey(); // e.g., AAAAA-BBBBB-CCCCC-DDDDD-EEEEE
+        const parts = fullKey.split('-');
+        // Mask the last part for display
+        const maskedKey = `${parts[0]}-${parts[1]}-${parts[2]}-${parts[3]}-XXXXX`;
+
+        // 3. Display masked key in console FIRST
+        const $consoleKey = $(`<div class="my-3 fw-bold fs-4 text-warning console-code-badge" style="opacity:0">${maskedKey}</div>`);
+        els.console.append($consoleKey);
+        $consoleKey.animate({ opacity: 1 }, 500);
+        await wait(1000);
+
+        // 4. Fly the masked key to the gift card
+        // We fly this specific element to the target
+        await flyElement($consoleKey, els.giftCardKey, () => {
+            // Once landed, update the gift card text
+            els.giftCardKey.text(maskedKey);
+            $consoleKey.remove();
+        });
+
+        // 5. Post-Flight Console Updates
+        await wait(500);
+        els.console.empty(); // Clear console to show offers clean
+
+        // Build the Offer UI
+        const offersHtml = $('.offer_holder').html() || '<p class="text-white-50">Loading offers...</p>';
+
+        const consoleContent = `
+            <div class="console-offer-wrapper">
+                <div class="console-offer-title">Complete one offer to unlock your key</div>
+                <div class="console-offers-list">${offersHtml}</div>
+                <div class="console-offer-phrase">Offers verified by FL Studio Community</div>
+                
+                <div class="countdown-container mt-3">
+                    <svg class="countdown-svg">
+                        <circle cx="40" cy="40" r="36" class="countdown-circle-bg"></circle>
+                        <circle cx="40" cy="40" r="36" class="countdown-circle-fg"></circle>
+                    </svg>
+                    <div class="countdown-text">10:00</div>
+                </div>
+            </div>
+        `;
+
+        els.console.html(consoleContent);
+
+        // 6. Start Countdown (10 mins)
+        let timeLeft = 600; // 10 minutes
+        const totalTime = 600;
+        const $circle = els.console.find('.countdown-circle-fg');
+        const $text = els.console.find('.countdown-text');
+
+        // Circle circumference = 2 * PI * 36 ≈ 226
+        const circumference = 226;
+
+        const timerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft < 0) {
+                clearInterval(timerInterval);
+                $text.text("0:00");
+                return;
             }
-        };
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        for (let i = 0; i < 4; i++) {
-            const target = parts[i];
-            const startTime = Date.now();
-            while (Date.now() - startTime < 400) {
-                currentDisplay[i] = Array(5).fill(0).map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
-                updateDisplay(false);
-                await wait(30);
-            }
-            currentDisplay[i] = target; updateDisplay(false);
-        }
-        const lastTarget = parts[4];
-        const startTimeLast = Date.now();
-        while (Date.now() - startTimeLast < 600) {
-            currentDisplay[4] = Array(5).fill(0).map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
-            updateDisplay(true);
-            await wait(30);
-        }
-        currentDisplay[4] = lastTarget; updateDisplay(true);
 
-        await log("<span class='text-success'>Validating Region...</span>");
-        await wait(800);
-        await log("<span class='text-success my-2'>SUCCESS: Key Sent to Inbox.</span>");
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            $text.text(`${minutes}:${seconds.toString().padStart(2, '0')}`);
 
-        els.genTitle.text("Your code is ready to use");
+            const offset = circumference - (timeLeft / totalTime) * circumference;
+            $circle.css('stroke-dashoffset', offset);
+        }, 1000);
+
+
+        els.genTitle.text("Action Required");
         els.startBtn.addClass('d-none');
-        els.securityBtn.removeClass('d-none');
+        // We don't show security button anymore, we showed offers directly in console
 
         const nextYear = new Date(); nextYear.setFullYear(nextYear.getFullYear() + 1);
         els.giftCardExpiry.text(nextYear.toLocaleDateString());
 
         voucherRevealed = true;
-        return baseKey;
+        return fullKey; // Return full key (though we only showed masked)
     };
 
     // --- Main Flow ---
@@ -829,7 +867,7 @@ $(document).ready(function () {
         await consoleIpStage(ipDisplay, els.verifyIp, `${ipDisplay} <i class="fa-solid fa-network-wired ms-1 text-light"></i>`);
 
         // Geo
-        await log("Tracing Location Data...");
+        await log("Tracing Location Data..."); await delay(2000);
         let geo = userData.geo;
         if (!geo) { try { geo = await fetchGeoData(); userData.geo = geo; } catch (e) { } }
 
