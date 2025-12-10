@@ -1,0 +1,164 @@
+
+.animation {
+  position: relative;
+  height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+      -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 5%,
+        black 95%,
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 5%,
+        black 95%,
+        transparent 100%
+    );
+}
+
+.card-stream {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.card-line {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  white-space: nowrap;
+  cursor: grab;
+  user-select: none;
+  will-change: transform;
+}
+
+.card-line:active {
+  cursor: grabbing;
+}
+
+.card-line.dragging {
+  cursor: grabbing;
+}
+
+.card-line.css-animated {
+  animation: scrollCards 40s linear infinite;
+}
+
+@keyframes scrollCards {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100vw);
+  }
+}
+
+.card-wrapper {
+  position: relative;
+  width: 200px;
+  height: 250px;
+  flex-shrink: 0;
+z-index: 9;
+}
+
+
+.card-image{
+width:fit-content;
+height:250px 
+}
+
+.card-normal {
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  z-index: 9;
+}
+
+
+.card-ascii {
+  background: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width:100%;
+  height: 250px;
+  overflow: hidden;
+  z-index:9;
+}
+
+.ascii-content {
+z-index:9;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  color: rgba(255,118,41, 0.6);
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  line-height: 13px;
+  overflow: hidden;
+  white-space: pre;
+  clip-path: inset(0 calc(100% - var(--clip-left, 0%)) 0 0);
+  animation: glitch 0.1s infinite linear alternate-reverse;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  vertical-align: top;
+  box-sizing: border-box;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.8) 30%,
+    rgba(0, 0, 0, 0.6) 50%,
+    rgba(0, 0, 0, 0.4) 80%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.8) 30%,
+    rgba(0, 0, 0, 0.6) 50%,
+    rgba(0, 0, 0, 0.4) 80%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+}
+
+
+
+.card-normal {
+  clip-path: inset(0 0 0 var(--clip-right, 0%));
+}
+
+.card-ascii {
+  clip-path: inset(0 calc(100% - var(--clip-left, 0%)) 0 0);
+}
+
+
+
+#particleCanvas {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 250px;
+  pointer-events: none;
+
+}
+
+#scannerCanvas {
+  position: absolute;
+  width: 100%;
+  height: 30px;
+  pointer-events: none;
+}
