@@ -460,19 +460,19 @@ body {
 
 /* Offers */
 .offer_item {
-    display: inline-block;
-    padding: 5px 10px;
-    margin: 5px;
-    background: var(--accent);
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: all 0.3s ease;
+    display: inline-block !important;
+    padding: 5px 10px !important;
+    margin: 5px !important;
+    background: var(--accent) !important;
+    color: white !important;
+    text-decoration: none !important;
+    border-radius: 5px !important;
+    transition: all 0.3s ease !important;
 }
 
 .offer_item:hover {
-    background: var(--accent-dark);
-    transform: translateY(-2px);
+    background: var(--accent-dark) !important;
+    transform: translateY(-2px) !important;
 }
 
 /* Marquee Carousel */
